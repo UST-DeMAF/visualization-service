@@ -1,5 +1,11 @@
 package ust.tad.visualizationservice.analysis;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ust.tad.visualizationservice.models.tadm.*;
+
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,13 +13,12 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import ust.tad.visualizationservice.models.tadm.*;
 
 @Service
 public class LayoutService {
+
+  @Value("${winery.path}")
+  private String WINERY_PATH;
 
   private static final Logger LOG = LoggerFactory.getLogger(LayoutService.class);
 
@@ -46,7 +51,7 @@ public class LayoutService {
         new double[] {convertPixelsToInches(width * 0.82), convertPixelsToInches(height * 0.79)};
     nodeSize = new double[] {convertPixelsToInches(225), convertPixelsToInches(60)};
 
-    String path = "/var/repository/graphviz/";
+    String path = WINERY_PATH + "/graphviz/";
     String file = transformationProcessId.toString() + ".dot";
 
     try {
@@ -93,7 +98,7 @@ public class LayoutService {
           targets.add(target);
           graph.put(source, targets);
         }
-      } else if (relationType.equals("ConnectsTo")) {
+      } else {
         if (subgraph.containsKey(source)) {
           subgraph.get(source).add(target);
           if (!rankSame.contains(source)) {
@@ -228,7 +233,8 @@ public class LayoutService {
   private void createNodeTypes(List<ComponentType> componentTypes, UUID id) {
     for (ComponentType componentType : componentTypes) {
       String nodeTypesPath =
-          "/var/repository/nodetypes/"
+            WINERY_PATH
+              + "/nodetypes/"
               + id.toString()
               + ".ust.tad.nodetypes/"
               + componentType.getName()
@@ -244,7 +250,7 @@ public class LayoutService {
         writer.write("tosca_definitions_version: tosca_simple_yaml_1_3\n\n");
         writer.write("node_types:\n");
         writer.write("  " + id + ".ust.tad.nodetypes." + componentType.getName() + ":\n");
-        writer.write("    derived_from: tosca.nodes.Root\n");
+        writer.write("    derived_from: tosca.nodes.Root\n"); //todo type hierarchy
         writer.write("    metadata:\n");
         writer.write("      targetNamespace: " + id + ".ust.tad.nodetypes\n");
         writer.write("      abstract: \"false\"\n");
@@ -342,7 +348,7 @@ public class LayoutService {
     }
 
     String serviceTemplatePath =
-        "/var/repository/servicetemplates/ust.tad.servicetemplates/" + id.toString() + "/";
+            WINERY_PATH + "/servicetemplates/ust.tad.servicetemplates/" + id.toString() + "/";
 
     try {
       Files.createDirectories(Paths.get(serviceTemplatePath));
@@ -383,10 +389,11 @@ public class LayoutService {
         if (!node.requirements.isEmpty()) {
           writer.write("      requirements:\n");
           for (Requirement requirement : node.requirements) {
-            if (requirement.type.equals("HostedOn")) {
-              writer.write("        - host:\n");
-            } else if (requirement.type.equals("ConnectsTo")) {
-              writer.write("        - connect:\n");
+            switch (requirement.type) {
+              case "HostedOn" -> writer.write("        - host:\n");
+              case "ConnectsTo" -> writer.write("        - connect:\n");
+              case "AttachesTo" -> writer.write("        - attach:\n");
+              default -> writer.write("        - " + requirement.type + ":\n");
             }
             writer.write("            node: " + nodes.get(requirement.node).name + "\n");
             writer.write("            relationship: " + requirement.relationship + "\n");
