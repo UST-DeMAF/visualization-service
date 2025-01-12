@@ -326,6 +326,7 @@ public class LayoutService {
 
       node.displayName = component.getName();
       node.name = component.getName() + "_" + count;
+      node.artifacts = component.getArtifacts();
       node.properties = component.getProperties();
 
       int[] coords = layout.get(node.displayName);
@@ -400,6 +401,13 @@ public class LayoutService {
             writer.write("            capability: " + requirement.capability + "\n");
           }
         }
+        writer.write("    artifacts:");
+        List<Artifact> artifacts = node.artifacts;
+        for (Artifact artifact : artifacts) {
+          writer.write("      " + artifact.getName() + ":\n");
+          writer.write("        type: " + artifact.getType() + "\n");
+          writer.write("        file: " + artifact.getFileUri().toString() + "\n");
+        }
       }
       writer.write("  relationship_templates: \n");
       for (Relation relation : relations) {
@@ -459,6 +467,7 @@ public class LayoutService {
     int x;
     int y;
     String displayName;
+    List<Artifact> artifacts;
     List<Property> properties;
     List<Requirement> requirements;
   }
