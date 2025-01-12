@@ -53,18 +53,18 @@ public class AnalysisTaskReceiver {
     ObjectMapper mapper = new ObjectMapper();
 
     AnalysisTaskStartRequest analysisTaskStartRequest =
-            mapper.convertValue(
-                    jsonMessageConverter.fromMessage(message), AnalysisTaskStartRequest.class);
+        mapper.convertValue(
+            jsonMessageConverter.fromMessage(message), AnalysisTaskStartRequest.class);
 
     LOG.info(
-            String.format(
-                    "received AnalysisTaskStartRequest: %s", analysisTaskStartRequest.toString()));
+        String.format(
+            "received AnalysisTaskStartRequest: %s", analysisTaskStartRequest.toString()));
     analysisService.startAnalysis(
-            analysisTaskStartRequest.getTaskId(),
-            analysisTaskStartRequest.getTransformationProcessId(),
-            analysisTaskStartRequest.getCommands(),
-            analysisTaskStartRequest.getOptions(),
-            analysisTaskStartRequest.getLocations());
+        analysisTaskStartRequest.getTaskId(),
+        analysisTaskStartRequest.getTransformationProcessId(),
+        analysisTaskStartRequest.getCommands(),
+        analysisTaskStartRequest.getOptions(),
+        analysisTaskStartRequest.getLocations());
   }
 
   /**

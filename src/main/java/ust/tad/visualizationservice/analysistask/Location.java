@@ -109,9 +109,9 @@ public class Location {
     }
     Location location = (Location) o;
     return Objects.equals(id, location.id)
-            && Objects.equals(url, location.url)
-            && startLineNumber == location.startLineNumber
-            && endLineNumber == location.endLineNumber;
+        && Objects.equals(url, location.url)
+        && startLineNumber == location.startLineNumber
+        && endLineNumber == location.endLineNumber;
   }
 
   /**
@@ -132,18 +132,18 @@ public class Location {
   @Override
   public String toString() {
     return "{"
-            + " id='"
-            + getId()
-            + "'"
-            + ", url='"
-            + getUrl()
-            + "'"
-            + ", startLineNumber='"
-            + getStartLineNumber()
-            + "'"
-            + ", endLineNumber='"
-            + getEndLineNumber()
-            + "'"
-            + "}";
+        + " id='"
+        + getId()
+        + "'"
+        + ", url='"
+        + getUrl()
+        + "'"
+        + ", startLineNumber='"
+        + getStartLineNumber()
+        + "'"
+        + ", endLineNumber='"
+        + getEndLineNumber()
+        + "'"
+        + "}";
   }
 }

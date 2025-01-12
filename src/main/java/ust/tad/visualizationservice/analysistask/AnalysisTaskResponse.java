@@ -99,8 +99,8 @@ public class AnalysisTaskResponse {
     }
     AnalysisTaskResponse analysisTaskResponse = (AnalysisTaskResponse) o;
     return Objects.equals(taskId, analysisTaskResponse.taskId)
-            && success == analysisTaskResponse.success
-            && Objects.equals(errorMessage, analysisTaskResponse.errorMessage);
+        && success == analysisTaskResponse.success
+        && Objects.equals(errorMessage, analysisTaskResponse.errorMessage);
   }
 
   /**
@@ -121,15 +121,15 @@ public class AnalysisTaskResponse {
   @Override
   public String toString() {
     return "{"
-            + " taskId='"
-            + getTaskId()
-            + "'"
-            + ", success='"
-            + getSuccess()
-            + "'"
-            + ", errorMessage='"
-            + getErrorMessage()
-            + "'"
-            + "}";
+        + " taskId='"
+        + getTaskId()
+        + "'"
+        + ", success='"
+        + getSuccess()
+        + "'"
+        + ", errorMessage='"
+        + getErrorMessage()
+        + "'"
+        + "}";
   }
 }

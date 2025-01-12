@@ -1,11 +1,5 @@
 package ust.tad.visualizationservice.analysis;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import ust.tad.visualizationservice.models.tadm.*;
-
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,6 +7,11 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ust.tad.visualizationservice.models.tadm.*;
 
 @Service
 public class LayoutService {
@@ -22,6 +21,7 @@ public class LayoutService {
 
   private static final Logger LOG = LoggerFactory.getLogger(LayoutService.class);
 
+  private Map<String, List<String>> artifactTypes = new HashMap<>();
   private final Map<String, int[]> layout = new HashMap<>();
   private final String regex = ".*\\$\\(.*\\).*";
 
@@ -63,6 +63,9 @@ public class LayoutService {
     createDotFile(components, relations, path + file);
     callGraphVIZ(path + file);
 
+    getArtifactTypes(components);
+
+    createArtifactTypes(transformationProcessId);
     createNodeTypes(componentTypes, transformationProcessId);
     createServiceTemplate(components, relations, transformationProcessId);
     clearVariables();
@@ -225,6 +228,37 @@ public class LayoutService {
     }
   }
 
+  private void createArtifactTypes(UUID id) {
+    for (Map.Entry<String, List<String>> entry : artifactTypes.entrySet()) {
+      String artifactTypePath =
+          WINERY_PATH
+              + "/artifacttypes/"
+              + id.toString()
+              + ".ust.tad.artifacttypes./"
+              + entry.getKey()
+              + "/";
+
+      try {
+        Files.createDirectories(Paths.get(artifactTypePath));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      try (FileWriter writer = new FileWriter(artifactTypePath + "ArtifactType.tosca")) {
+        writer.write("tosca_definitions_version: tosca_simple_yaml_1_3\n\n");
+        writer.write("artifact_types:\n");
+        writer.write("  " + id + ".ust.tad.artifacttypes." + entry.getKey() + ":\n");
+        writer.write("    derived_from: tosca.artifacts.Root\n");
+        writer.write("    metadata:\n");
+        writer.write("      targetNamespace: " + id + ".ust.tad.artifacttypes\n");
+        writer.write("      abstract: \"false\"\n");
+        writer.write("      final: \"false\"\n");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
   /*
    * Creates the node types for the components in the TADM.
    * @param componentTypes The component types in the TADM.
@@ -233,7 +267,7 @@ public class LayoutService {
   private void createNodeTypes(List<ComponentType> componentTypes, UUID id) {
     for (ComponentType componentType : componentTypes) {
       String nodeTypesPath =
-            WINERY_PATH
+          WINERY_PATH
               + "/nodetypes/"
               + id.toString()
               + ".ust.tad.nodetypes/"
@@ -250,26 +284,28 @@ public class LayoutService {
         writer.write("tosca_definitions_version: tosca_simple_yaml_1_3\n\n");
         writer.write("node_types:\n");
         writer.write("  " + id + ".ust.tad.nodetypes." + componentType.getName() + ":\n");
-        writer.write("    derived_from: tosca.nodes.Root\n"); //todo type hierarchy
+        writer.write("    derived_from: tosca.nodes.Root\n"); // todo type hierarchy
         writer.write("    metadata:\n");
         writer.write("      targetNamespace: " + id + ".ust.tad.nodetypes\n");
         writer.write("      abstract: \"false\"\n");
         writer.write("      final: \"false\"\n");
-        writer.write("    properties:\n");
         List<Property> properties = componentType.getProperties();
-        for (Property property : properties) {
-          String key = property.getKey();
-          String value = property.getValue().toString();
-          if (isNumeric(key)) {
-            key = "\"" + key + "\"";
+        if (!properties.isEmpty()) {
+          writer.write("    properties:\n");
+          for (Property property : properties) {
+            String key = property.getKey();
+            String value = property.getValue().toString();
+            if (isNumeric(key)) {
+              key = "\"" + key + "\"";
+            }
+            if (value.matches(regex)) {
+              value = "\"" + value + "\"";
+            }
+            writer.write("      " + key + ":\n");
+            writer.write("        type: " + property.getType().name() + "\n");
+            writer.write("        required: " + property.getRequired() + "\n");
+            writer.write("        default: " + value + "\n");
           }
-          if (value.matches(regex)) {
-            value = "\"" + value + "\"";
-          }
-          writer.write("      " + key + ":\n");
-          writer.write("        type: " + property.getType().name() + "\n");
-          writer.write("        required: " + property.getRequired() + "\n");
-          writer.write("        default: " + value + "\n");
         }
         writer.write("    requirements:\n");
         writer.write("      - host:\n");
@@ -290,6 +326,20 @@ public class LayoutService {
         writer.write("            description: The standard configure operation\n");
         writer.write("          delete:\n");
         writer.write("            description: The standard delete operation\n");
+        boolean dictionary = false;
+        for (Map.Entry<String, List<String>> entry : artifactTypes.entrySet()) {
+          if (entry.getValue().contains(componentType.getName())) {
+            if (!dictionary) {
+              writer.write("    artifacts:\n");
+              dictionary = true;
+            }
+            writer.write("      " + entry.getKey() + ":\n");
+            writer.write("        type: " + id + ".ust.tad.artifacttypes." + entry.getKey() + "\n");
+            writer.write("        description: \"\"\n");
+            writer.write("        deploy_path: \"\"\n");
+            writer.write("        file: \"\"\n");
+          }
+        }
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -349,7 +399,7 @@ public class LayoutService {
     }
 
     String serviceTemplatePath =
-            WINERY_PATH + "/servicetemplates/ust.tad.servicetemplates/" + id.toString() + "/";
+        WINERY_PATH + "/servicetemplates/ust.tad.servicetemplates/" + id.toString() + "/";
 
     try {
       Files.createDirectories(Paths.get(serviceTemplatePath));
@@ -401,12 +451,21 @@ public class LayoutService {
             writer.write("            capability: " + requirement.capability + "\n");
           }
         }
-        writer.write("    artifacts:");
-        List<Artifact> artifacts = node.artifacts;
-        for (Artifact artifact : artifacts) {
-          writer.write("      " + artifact.getName() + ":\n");
-          writer.write("        type: " + artifact.getType() + "\n");
-          writer.write("        file: " + artifact.getFileUri().toString() + "\n");
+        if (!node.artifacts.isEmpty()) {
+          writer.write("    artifacts:\n");
+          List<Artifact> artifacts = node.artifacts;
+          for (Artifact artifact : artifacts) {
+            writer.write("      " + artifact.getType() + ":\n");
+            writer.write(
+                "        type: " + id + ".ust.tad.artifacttypes." + artifact.getType() + "\n");
+            writer.write("        description: " + artifact.getName() + "\n");
+            writer.write("        deploy_path: \"\"\n");
+            if (artifact.getFileUri() == null) {
+              writer.write("        file: \"\"\n");
+            } else {
+              writer.write("        file: " + artifact.getFileUri().toString() + "\n");
+            }
+          }
         }
       }
       writer.write("  relationship_templates: \n");
@@ -426,6 +485,7 @@ public class LayoutService {
     components.clear();
     componentTypes.clear();
     relations.clear();
+    artifactTypes.clear();
     layout.clear();
   }
 
@@ -445,6 +505,30 @@ public class LayoutService {
    */
   private double convertPixelsToInches(double pixels) {
     return (double) Math.round((pixels / dpi) * 100) / 100;
+  }
+
+  /*
+   *
+   */
+  private void getArtifactTypes(List<Component> components) {
+    for (Component component : components) {
+      String componentType = component.getType().getName();
+      List<Artifact> artifacts = component.getArtifacts();
+
+      for (Artifact artifact : artifacts) {
+        String type = artifact.getType();
+        artifact.getConfidence().toString();
+        if (artifactTypes.containsKey(type)) {
+          if (!artifactTypes.get(type).contains(componentType)) {
+            artifactTypes.get(type).add(componentType);
+          }
+        } else {
+          List<String> componentTypes = new ArrayList<>();
+          componentTypes.add(componentType);
+          artifactTypes.put(type, componentTypes);
+        }
+      }
+    }
   }
 
   /*
