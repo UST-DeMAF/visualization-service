@@ -284,7 +284,24 @@ public class LayoutService {
         writer.write("tosca_definitions_version: tosca_simple_yaml_1_3\n\n");
         writer.write("node_types:\n");
         writer.write("  " + id + ".ust.tad.nodetypes." + componentType.getName() + ":\n");
-        writer.write("    derived_from: tosca.nodes.Root\n"); // todo type hierarchy
+        if (componentType.getParentType() == null) {
+          writer.write("    derived_from: tosca.nodes.Root\n");
+        } else {
+          if (componentTypes.contains(componentType.getParentType())) {
+            writer.write(
+                "    derived_from: "
+                    + id
+                    + ".ust.tad.nodetypes."
+                    + componentType.getParentType().getName()
+                    + "\n");
+          } else {
+            LOG.info(
+                "Parent type {} of component type {} is unknown.",
+                componentType.getParentType().getName(),
+                componentType.getName());
+            writer.write("    derived_from: tosca.nodes.Root\n");
+          }
+        }
         writer.write("    metadata:\n");
         writer.write("      targetNamespace: " + id + ".ust.tad.nodetypes\n");
         writer.write("      abstract: \"false\"\n");
