@@ -228,6 +228,10 @@ public class LayoutService {
     }
   }
 
+  /*
+   * Creates the artifact types for the components in the TADM.
+   * @param id The ID of the transformation process.
+   */
   private void createArtifactTypes(UUID id) {
     for (Map.Entry<String, List<String>> entry : artifactTypes.entrySet()) {
       String artifactTypePath =
@@ -527,7 +531,8 @@ public class LayoutService {
   }
 
   /*
-   *
+   * Gets the artifact types for the components in the TADM.
+   * @param components The components in the TADM.
    */
   private void getArtifactTypes(List<Component> components) {
     for (Component component : components) {
