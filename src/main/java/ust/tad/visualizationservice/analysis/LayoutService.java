@@ -425,17 +425,19 @@ public class LayoutService {
         writer.write("        x: '" + node.x + "'\n");
         writer.write("        y: '" + node.y + "'\n");
         writer.write("        displayName: " + node.displayName + "\n");
-        writer.write("      properties:\n");
-        for (Property property : node.properties) {
-          String key = property.getKey();
-          String value = property.getValue().toString();
-          if (isNumeric(key)) {
-            key = "\"" + key + "\"";
+        if (!node.properties.isEmpty()) {
+          writer.write("      properties:\n");
+          for (Property property : node.properties) {
+            String key = property.getKey();
+            String value = property.getValue().toString();
+            if (isNumeric(key)) {
+              key = "\"" + key + "\"";
+            }
+            if (value.matches(regex)) {
+              value = "\"" + value + "\"";
+            }
+            writer.write("        " + key + ": " + value + "\n");
           }
-          if (value.matches(regex)) {
-            value = "\"" + value + "\"";
-          }
-          writer.write("        " + key + ": " + value + "\n");
         }
         if (!node.requirements.isEmpty()) {
           writer.write("      requirements:\n");
@@ -452,18 +454,18 @@ public class LayoutService {
           }
         }
         if (!node.artifacts.isEmpty()) {
-          writer.write("    artifacts:\n");
+          writer.write("      artifacts:\n");
           List<Artifact> artifacts = node.artifacts;
           for (Artifact artifact : artifacts) {
-            writer.write("      " + artifact.getType() + ":\n");
+            writer.write("        " + artifact.getName() + ":\n");
             writer.write(
-                "        type: " + id + ".ust.tad.artifacttypes." + artifact.getType() + "\n");
-            writer.write("        description: " + artifact.getName() + "\n");
-            writer.write("        deploy_path: \"\"\n");
+                "          type: " + id + ".ust.tad.artifacttypes." + artifact.getType() + "\n");
+            writer.write("          description: \"\"\n");
+            writer.write("          deploy_path: \"\"\n");
             if (artifact.getFileUri() == null) {
-              writer.write("        file: \"\"\n");
+              writer.write("          file: \"\"\n");
             } else {
-              writer.write("        file: " + artifact.getFileUri().toString() + "\n");
+              writer.write("          file: " + artifact.getFileUri().toString() + "\n");
             }
           }
         }
