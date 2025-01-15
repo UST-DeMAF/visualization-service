@@ -347,12 +347,12 @@ public class LayoutService {
         writer.write("            description: The standard configure operation\n");
         writer.write("          delete:\n");
         writer.write("            description: The standard delete operation\n");
-        boolean dictionary = false;
+        boolean writeArtifactsHeader = true;
         for (Map.Entry<String, List<String>> entry : artifactTypes.entrySet()) {
           if (entry.getValue().contains(componentType.getName())) {
-            if (!dictionary) {
+            if (writeArtifactsHeader) {
               writer.write("    artifacts:\n");
-              dictionary = true;
+              writeArtifactsHeader = false;
             }
             writer.write("      " + entry.getKey() + ":\n");
             writer.write("        type: " + id + ".ust.tad.artifacttypes." + entry.getKey() + "\n");
