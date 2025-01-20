@@ -21,7 +21,7 @@ public class LayoutService {
 
   private static final Logger LOG = LoggerFactory.getLogger(LayoutService.class);
 
-  private Map<String, List<String>> artifactTypes = new HashMap<>();
+  private final Map<String, List<String>> artifactTypes = new HashMap<>();
   private final Map<String, int[]> layout = new HashMap<>();
   private final String regex = ".*\\$\\(.*\\).*";
 
@@ -238,7 +238,7 @@ public class LayoutService {
           WINERY_PATH
               + "/artifacttypes/"
               + id.toString()
-              + ".ust.tad.artifacttypes./"
+              + ".ust.tad.artifacttypes/"
               + entry.getKey()
               + "/";
 
@@ -254,7 +254,7 @@ public class LayoutService {
         writer.write("  " + id + ".ust.tad.artifacttypes." + entry.getKey() + ":\n");
         writer.write("    derived_from: tosca.artifacts.Root\n");
         writer.write("    metadata:\n");
-        writer.write("      targetNamespace: " + id + ".ust.tad.artifacttypes\n");
+        writer.write("      targetNamespace: \"" + id + ".ust.tad.artifacttypes\"\n");
         writer.write("      abstract: \"false\"\n");
         writer.write("      final: \"false\"\n");
       } catch (IOException e) {
@@ -307,7 +307,7 @@ public class LayoutService {
           }
         }
         writer.write("    metadata:\n");
-        writer.write("      targetNamespace: " + id + ".ust.tad.nodetypes\n");
+        writer.write("      targetNamespace: \"" + id + ".ust.tad.nodetypes\"\n");
         writer.write("      abstract: \"false\"\n");
         writer.write("      final: \"false\"\n");
         List<Property> properties = componentType.getProperties();
@@ -541,7 +541,6 @@ public class LayoutService {
 
       for (Artifact artifact : artifacts) {
         String type = artifact.getType();
-        artifact.getConfidence().toString();
         if (artifactTypes.containsKey(type)) {
           if (!artifactTypes.get(type).contains(componentType)) {
             artifactTypes.get(type).add(componentType);
