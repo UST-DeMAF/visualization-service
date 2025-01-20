@@ -33,13 +33,13 @@ public class EmbeddedDeploymentModelAnalysisRequest {
    * @param tadmEntities The map of tadm entities to be analyzed.
    */
   public EmbeddedDeploymentModelAnalysisRequest(
-          UUID parentTaskId,
-          UUID transformationProcessId,
-          String technology,
-          List<String> commands,
-          List<String> options,
-          List<Location> locations,
-          Map<String, List<String>> tadmEntities) {
+      UUID parentTaskId,
+      UUID transformationProcessId,
+      String technology,
+      List<String> commands,
+      List<String> options,
+      List<Location> locations,
+      Map<String, List<String>> tadmEntities) {
     this.parentTaskId = parentTaskId;
     this.transformationProcessId = transformationProcessId;
     this.technology = technology;
@@ -124,7 +124,7 @@ public class EmbeddedDeploymentModelAnalysisRequest {
    * @return The current EmbeddedDeploymentModelAnalysisRequest object.
    */
   public EmbeddedDeploymentModelAnalysisRequest transformationProcessId(
-          UUID transformationProcessId) {
+      UUID transformationProcessId) {
     setTransformationProcessId(transformationProcessId);
     return this;
   }
@@ -182,7 +182,8 @@ public class EmbeddedDeploymentModelAnalysisRequest {
    * @param tadmEntities The map of tadm entities to be analyzed.
    * @return The current EmbeddedDeploymentModelAnalysisRequest object.
    */
-  public EmbeddedDeploymentModelAnalysisRequest tadmEntities(Map<String, List<String>> tadmEntities) {
+  public EmbeddedDeploymentModelAnalysisRequest tadmEntities(
+      Map<String, List<String>> tadmEntities) {
     setTadmEntities(tadmEntities);
     return this;
   }
@@ -200,15 +201,15 @@ public class EmbeddedDeploymentModelAnalysisRequest {
       return false;
     }
     EmbeddedDeploymentModelAnalysisRequest embeddedDeploymentModelAnalysisRequest =
-            (EmbeddedDeploymentModelAnalysisRequest) o;
+        (EmbeddedDeploymentModelAnalysisRequest) o;
     return Objects.equals(parentTaskId, embeddedDeploymentModelAnalysisRequest.parentTaskId)
-            && Objects.equals(
+        && Objects.equals(
             transformationProcessId, embeddedDeploymentModelAnalysisRequest.transformationProcessId)
-            && Objects.equals(technology, embeddedDeploymentModelAnalysisRequest.technology)
-            && Objects.equals(commands, embeddedDeploymentModelAnalysisRequest.commands)
-            && Objects.equals(options, embeddedDeploymentModelAnalysisRequest.options)
-            && Objects.equals(locations, embeddedDeploymentModelAnalysisRequest.locations)
-            && Objects.equals(tadmEntities, embeddedDeploymentModelAnalysisRequest.tadmEntities);
+        && Objects.equals(technology, embeddedDeploymentModelAnalysisRequest.technology)
+        && Objects.equals(commands, embeddedDeploymentModelAnalysisRequest.commands)
+        && Objects.equals(options, embeddedDeploymentModelAnalysisRequest.options)
+        && Objects.equals(locations, embeddedDeploymentModelAnalysisRequest.locations)
+        && Objects.equals(tadmEntities, embeddedDeploymentModelAnalysisRequest.tadmEntities);
   }
 
   /**
@@ -219,7 +220,13 @@ public class EmbeddedDeploymentModelAnalysisRequest {
   @Override
   public int hashCode() {
     return Objects.hash(
-            parentTaskId, transformationProcessId, technology, commands, options, locations, tadmEntities);
+        parentTaskId,
+        transformationProcessId,
+        technology,
+        commands,
+        options,
+        locations,
+        tadmEntities);
   }
 
   /**
@@ -230,27 +237,27 @@ public class EmbeddedDeploymentModelAnalysisRequest {
   @Override
   public String toString() {
     return "{"
-            + " parentTaskId='"
-            + getParentTaskId()
-            + "'"
-            + ", transformationProcessId='"
-            + getTransformationProcessId()
-            + "'"
-            + ", technology='"
-            + getTechnology()
-            + "'"
-            + ", commands='"
-            + getCommands()
-            + "'"
-            + ", options='"
-            + getOptions()
-            + "'"
-            + ", locations='"
-            + getLocations()
-            + "'"
-            + ", tadmEntities='"
-            + getTadmEntities()
-            + "'"
-            + "}";
+        + " parentTaskId='"
+        + getParentTaskId()
+        + "'"
+        + ", transformationProcessId='"
+        + getTransformationProcessId()
+        + "'"
+        + ", technology='"
+        + getTechnology()
+        + "'"
+        + ", commands='"
+        + getCommands()
+        + "'"
+        + ", options='"
+        + getOptions()
+        + "'"
+        + ", locations='"
+        + getLocations()
+        + "'"
+        + ", tadmEntities='"
+        + getTadmEntities()
+        + "'"
+        + "}";
   }
 }
