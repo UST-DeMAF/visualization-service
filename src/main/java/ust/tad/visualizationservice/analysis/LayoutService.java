@@ -483,10 +483,10 @@ public class LayoutService {
                 "          type: " + id + ".ust.tad.artifacttypes." + artifact.getType() + "\n");
             writer.write("          description: \"\"\n");
             writer.write("          deploy_path: \"\"\n");
-            if (artifact.getFileUri() == null) {
+            if (artifact.getFileURI() == null) {
               writer.write("          file: \"\"\n");
             } else {
-              writer.write("          file: " + artifact.getFileUri().toString() + "\n");
+              writer.write("          file: " + artifact.getFileURI().toString() + "\n");
             }
           }
         }
