@@ -60,9 +60,9 @@ public class AnalysisTaskResponseSender {
   }
 
   /**
-   * Send a message containing an Analysis Task Response.
-   * The response is added as a JSON in the message body.
-   * The format indicator field in the header is used to identify the type of response.
+   * Send a message containing an Analysis Task Response. The response is added as a JSON in the
+   * message body. The format indicator field in the header is used to identify the type of
+   * response.
    *
    * @param analysisTaskResponse the Analysis Task Response to send.
    */
@@ -70,10 +70,10 @@ public class AnalysisTaskResponseSender {
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       Message message =
-              MessageBuilder.withBody(objectMapper.writeValueAsString(analysisTaskResponse).getBytes())
-                      .setContentType(MessageProperties.CONTENT_TYPE_JSON)
-                      .setHeader("formatIndicator", "AnalysisTaskResponse")
-                      .build();
+          MessageBuilder.withBody(objectMapper.writeValueAsString(analysisTaskResponse).getBytes())
+              .setContentType(MessageProperties.CONTENT_TYPE_JSON)
+              .setHeader("formatIndicator", "AnalysisTaskResponse")
+              .build();
       template.convertAndSend(responseExchangeName, "", message);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
@@ -81,22 +81,22 @@ public class AnalysisTaskResponseSender {
   }
 
   /**
-   * Send the Embedded Deployment Model Analysis Task Request.
-   * The request is added as a JSON in the message body.
-   * The format indicator field in the header is used to identify the type of response.
+   * Send the Embedded Deployment Model Analysis Task Request. The request is added as a JSON in the
+   * message body. The format indicator field in the header is used to identify the type of
+   * response.
    *
    * @param request the Embedded Deployment Model Analysis Task Request.
    */
   public void sendEmbeddedDeploymentModelAnalysisRequest(
-          EmbeddedDeploymentModelAnalysisRequest request) {
+      EmbeddedDeploymentModelAnalysisRequest request) {
     LOG.info("Sending EmbeddedDeploymentModelAnalysisRequest: " + request.toString());
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       Message message =
-              MessageBuilder.withBody(objectMapper.writeValueAsString(request).getBytes())
-                      .setContentType(MessageProperties.CONTENT_TYPE_JSON)
-                      .setHeader("formatIndicator", "EmbeddedDeploymentModelAnalysisRequest")
-                      .build();
+          MessageBuilder.withBody(objectMapper.writeValueAsString(request).getBytes())
+              .setContentType(MessageProperties.CONTENT_TYPE_JSON)
+              .setHeader("formatIndicator", "EmbeddedDeploymentModelAnalysisRequest")
+              .build();
       template.convertAndSend(responseExchangeName, "", message);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
@@ -111,7 +111,7 @@ public class AnalysisTaskResponseSender {
    * @param parentTaskId The unique identifier of the parent task.
    */
   public void sendEmbeddedDeploymentModelAnalysisRequestFromModel(
-          TechnologySpecificDeploymentModel embeddedDeploymentModel, UUID parentTaskId) {
+      TechnologySpecificDeploymentModel embeddedDeploymentModel, UUID parentTaskId) {
     EmbeddedDeploymentModelAnalysisRequest request = new EmbeddedDeploymentModelAnalysisRequest();
     request.setParentTaskId(parentTaskId);
     request.setTransformationProcessId(embeddedDeploymentModel.getTransformationProcessId());
@@ -149,8 +149,10 @@ public class AnalysisTaskResponseSender {
    * @param technology the deployment technology of the embedded deployment model.
    */
   public void sendEmbeddedDeploymentModelAnalysisRequestFromTADMEntities(
-          Map<String, List<String>> tadmEntities, UUID parentTaskId, UUID transformationProcessId
-          , String technology) {
+      Map<String, List<String>> tadmEntities,
+      UUID parentTaskId,
+      UUID transformationProcessId,
+      String technology) {
     EmbeddedDeploymentModelAnalysisRequest request = new EmbeddedDeploymentModelAnalysisRequest();
     request.setParentTaskId(parentTaskId);
     request.setTransformationProcessId(transformationProcessId);

@@ -145,7 +145,7 @@ public class AnalysisService {
               if (Objects.nonNull(value)) {
                 fileURI = value.toString();
                 if (!fileURI.isEmpty() && !fileURI.equals("-")) {
-                  artifact.setFileUri(URI.create(value.toString()));
+                  artifact.setFileURI(URI.create(value.toString()));
                 }
               }
               break;
