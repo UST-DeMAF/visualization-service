@@ -87,6 +87,7 @@ public class AnalysisService {
     }
 
     layoutService.generateLayout(tadm, dpi, flatten, width, height);
+    clearVariables();
     analysisTaskResponseSender.sendSuccessResponse(taskId);
   }
 
@@ -738,5 +739,17 @@ public class AnalysisService {
     readRelationTypes(parsedYaml.get("relation_types"));
     readComponents(parsedYaml.get("components"));
     readRelations(parsedYaml.get("relations"));
+  }
+
+  /**
+   * Clears the variables and resources set to avoid side effects between different transformation
+   * processes.
+   */
+  private void clearVariables() {
+    components.clear();
+    componentTypes.clear();
+    relations.clear();
+    relationTypes.clear();
+    properties.clear();
   }
 }
