@@ -117,7 +117,9 @@ public class AnalysisService {
   }
 
   /*
-   * Read the artifacts from the given object.
+   * Read the artifacts from the given object. An artifact is either a map with the keys type,
+   * name, and fileURI, or, as the DeMAF writes EDMM models, a map with the artifact type as its
+   * only key and a map with name and fileURI as its value.
    * @param obj the object
    * @return the list of artifacts
    */
@@ -130,6 +132,13 @@ public class AnalysisService {
       List<Map<String, Object>> list = (List<Map<String, Object>>) obj;
       for (Map<String, Object> map : list) {
         Artifact artifact = new Artifact();
+
+        if (map.size() == 1 && map.values().iterator().next() instanceof Map) {
+          Map.Entry<String, Object> typed = map.entrySet().iterator().next();
+          Map<String, Object> details = new LinkedHashMap<>((Map<String, Object>) typed.getValue());
+          details.put("type", typed.getKey());
+          map = details;
+        }
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
           key = entry.getKey();
