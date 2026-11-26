@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
 import ust.tad.visualizationservice.models.tadm.*;
 
 @Service
@@ -319,9 +321,7 @@ public class LayoutService {
             if (isNumeric(key)) {
               key = "\"" + key + "\"";
             }
-            if (value.matches(regex)) {
-              value = "\"" + value + "\"";
-            }
+            value = toYamlValue(value);
             writer.write("      " + key + ":\n");
             writer.write("        type: " + property.getType().name() + "\n");
             writer.write("        required: " + property.getRequired() + "\n");
@@ -454,9 +454,7 @@ public class LayoutService {
             if (isNumeric(key)) {
               key = "\"" + key + "\"";
             }
-            if (value.matches(regex)) {
-              value = "\"" + value + "\"";
-            }
+            value = toYamlValue(value);
             writer.write("        " + key + ": " + value + "\n");
           }
         }
@@ -552,6 +550,44 @@ public class LayoutService {
         }
       }
     }
+  }
+
+  /**
+   * Format a property value for writing it after a key in a YAML file. Values containing $(...)
+   * are put in quotes as before. Other values are written as they are, unless they are not valid
+   * YAML or YAML would read them back as a different string (e.g., because "#" starts a
+   * comment); then they are written as a double-quoted string with escapes.
+   *
+   * @param value the value
+   * @return the value as it is written to the YAML file
+   */
+  String toYamlValue(String value) {
+    if (value.matches(regex)) {
+      return "\"" + value + "\"";
+    }
+    if (value.contains("\n") || value.contains("\r")) {
+      return toDoubleQuoted(value);
+    }
+    try {
+      Object parsed = ((Map<?, ?>) new Yaml().load("value: " + value)).get("value");
+      if (parsed instanceof String && !parsed.equals(value)) {
+        return toDoubleQuoted(value);
+      }
+      return value;
+    } catch (YAMLException | ClassCastException e) {
+      return toDoubleQuoted(value);
+    }
+  }
+
+  private String toDoubleQuoted(String value) {
+    return "\""
+        + value
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t")
+        + "\"";
   }
 
   /*
